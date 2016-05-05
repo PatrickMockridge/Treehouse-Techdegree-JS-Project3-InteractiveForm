@@ -13,6 +13,10 @@ $('#fieldset-1').append("<input type='text' id='other-field' placeholder='Your T
 $("#other-field").hide();
 //empty the color selector
 $('#color').empty();
+// Append total cost of everthing selected to the bottom of the activities fieldset
+// instantiate total cost variable
+var totalCost = 0;
+$('.activities').append("<p id='p2'> Total Cost Will Be: $" + totalCost + "</p>");
 // html finished loading, focus on first input field
 //focus on first field when document is ready document ready
 $(document).ready(function() {
@@ -56,11 +60,16 @@ $(".activities > label").each (function() {
     // assign an appropriate variable
       $(this).children().attr("id", "afternoonBox");
     }
-});
+else {
+      // assign an appropriate variable
+      $(this).children().attr("id", "wholeDayBox");
+}});
 ///////////////////////////////////////////////////////////////////////////
 // When Check Boxes Change State, Stuff Happens
 //////////////////////////////////////////////////////////////////////////
 $(".activities").find("input:checkbox").change(function() {
+// remove the total Cost because it's going to be updated at the end of the function
+$('#p2').remove();
 // create a global 'this'
 var checkedBox = $(this);
 ///////////////////////////////////////////////////////////////////////
@@ -75,12 +84,15 @@ var checkedBox = $(this);
       $(".activities > label").each (function() {
         // check to see if they are related to a morning workshop as well
         if ($(this).find("input").attr("id") == "morningBox") {
-          //if so, append some text to the other boxes showing that the morning has been booked
-          $(this).append('<small id="morningBooked"><b> &#10060; Morning Booked<b></small>');
-          // remove text from the box that has already been ckecked
-          // disable relevant check boxes to prevent double-booking
+          //disable other check boxes of the same type
+          $(this).find("input:not(:checked)").attr('disabled', 'disabled');
+          // append some text to the unchecked boxes of the same type showing that the morning has been booked
+          $(this).find("input:not(:checked)").parent().append('<small id="Booked"><b> &#10060; Already Booked<b></small>');
+          // cost goes up by $100
+
         }
       });
+          totalCost += 100;
     }
     // ************************************************
     // if checkbox related to an afternoon workshop is checked
@@ -90,13 +102,20 @@ var checkedBox = $(this);
      $(".activities > label").each (function() {
       // then check to see if the checkbox relates to a morning workshop
        if ($(this).children().attr("id") === "afternoonBox") {
-         // append text that the afternoon has already been booked
-         $(this).append('<small id="afternoonBooked"><b> &#10060; Afternoon Booked<b></small>');
-         // remove text from the box that has already been ckecked
-         // disable relevant check boxes to prevent double-booking
+         //disable other check boxes of the same type
+         $(this).find("input:not(:checked)").attr('disabled', 'disabled');
+         // append some text to the unchecked boxes of the same type showing that the morning has been booked
+         $(this).find("input:not(:checked)").parent().append('<small id="Booked"><b> &#10060; Already Booked<b></small>');
+
        }
      });
-   }}
+        totalCost += 100;
+   }
+   else if ($(this).attr("id") == "wholeDayBox") {
+     // remaining box is for the conference
+     totalCost += 200;
+   }
+ }
     ///////////////////////////////////////////////////////////////////////////
     // When Check Box is Unchecked
     //////////////////////////////////////////////////////////////////////////
@@ -104,22 +123,41 @@ var checkedBox = $(this);
       // ************************************************
       // if the checkbox related to a morning workshop is unchecked
       // ************************************************
-       if ($(this).attr("id") == "morningBox") {
-         $(".activities > label").each (function() {
-           if ($(this).children().attr("id") === "morningBox") {
-             // remove appended tag
-             $(this).children("#morningBooked").remove();
-           }
-         })}
+      if ($(this).attr("id") == "morningBox") {
+        // then do stuff to each of the other check boxes
+        $(".activities > label").each (function() {
+          // check to see if they are related to a morning workshop
+          if ($(this).find("input").attr("id") == "morningBox") {
+            //disable other check boxes of the same type
+            $(this).find("input:not(:checked)").prop('disabled', false);
+            //remove appended tag
+            $(this).find('#Booked').remove();
+          }})
+          //cost goes down $100
+          totalCost -= 100;
+        }
          // ************************************************
          // if the checkbox related to a afternoon workshop is unchecked
          // ************************************************
        else if ($(this).attr("id") == "afternoonBox") {
+         //then do stuff to each of the other check boxes
          $(".activities > label").each (function() {
+           // check to see if they are related to an afternoon workshop
            if ($(this).children().attr("id") === "afternoonBox") {
+             // disable other check boxes of the same type
+             $(this).find("input:not(:checked)").prop('disabled', false);
              // remove appended tag
-             $(this).children('#afternoonBooked').remove();
-           }
-         })}
+             $(this).children('#Booked').remove();
+           }})
+          // cost goes down $100
+          totalCost -= 100;
+       }
+         else if ($(this).attr("id") == "wholeDayBox") {
+           // remaining box is for the conference
+           totalCost -= 200;
+         }
+
   }
+  //update total cost
+  $('.activities').append("<p id='p2'>Total Cost Will Be: $" + totalCost + "</p>");
 });
