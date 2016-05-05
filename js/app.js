@@ -30,7 +30,9 @@ $( "#title").change(function() {
  else {
     $("#other-field").hide();
   }});
+//////////////////////////////////////////////////////////////////
 // display correct color selectors based upon T-shirt design
+//////////////////////////////////////////////////////////////////
 $( "#design").change(function() {
   // check if Theme - JS Puns has been selected
       if ($("#design option:selected").text() == "Theme - JS Puns") {
@@ -48,7 +50,9 @@ $( "#design").change(function() {
               $('#color').empty();
       }
 });
+//////////////////////////////////////////////////////////////////
 // assign ID to activities based upon time of day
+//////////////////////////////////////////////////////////////////
 $(".activities > label").each (function() {
   // if the checkbox label relates to a morning activity
   if ($(this).text().indexOf("9am-12pm") >= 0) {
@@ -160,4 +164,39 @@ var checkedBox = $(this);
   }
   //update total cost
   $('.activities').append("<p id='p2'>Total Cost Will Be: $" + totalCost + "</p>");
+});
+///////////////////////////////////////////////////////////////////////////
+// Payment Fieldset Validator
+//////////////////////////////////////////////////////////////////////////
+// Hide everything by default initially
+$( "p:contains('PayPal')").hide();
+$( "p:contains('Bitcoin')").hide();
+$( "#credit-card").hide();
+$( "#payment").change(function() {
+  // if Credit Card selected
+      if ($("#payment option:selected").text() == "Credit Card") {
+        // hide Bitcoin and Paypal elements
+          $( "#credit-card").show();
+          $( "p:contains('PayPal')").hide();
+          $( "p:contains('Bitcoin')").hide();
+          }
+  // if PayPal selected
+      else if ($("#payment option:selected").text() == "PayPal") {
+        // hide Bitcoin and credit card elements
+          $( "p:contains('PayPal')").show();
+          $( "p:contains('Bitcoin')").hide();
+          $( "#credit-card").hide();
+          }
+  // if bitcoin selected
+      else if ($("#payment option:selected").text() == "Bitcoin") {
+        // hide PayPal and credit card elements
+          $( "p:contains('Bitcoin')").show();
+          $( "p:contains('PayPal')").hide();
+          $( "#credit-card").hide();
+          }
+      else {
+        $( "p:contains('PayPal')").hide();
+        $( "p:contains('Bitcoin')").hide();
+        $( "#credit-card").hide();
+      }
 });
