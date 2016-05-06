@@ -30,6 +30,8 @@ $( "#title").change(function() {
  else {
     $("#other-field").hide();
   }});
+
+
 //////////////////////////////////////////////////////////////////
 // display correct color selectors based upon T-shirt design
 //////////////////////////////////////////////////////////////////
@@ -136,7 +138,7 @@ var checkedBox = $(this);
             $(this).find("input:not(:checked)").prop('disabled', false);
             //remove appended tag
             $(this).find('#Booked').remove();
-          }})
+          }});
           //cost goes down $100
           totalCost -= 100;
         }
@@ -152,7 +154,7 @@ var checkedBox = $(this);
              $(this).find("input:not(:checked)").prop('disabled', false);
              // remove appended tag
              $(this).children('#Booked').remove();
-           }})
+           }});
           // cost goes down $100
           totalCost -= 100;
        }
@@ -164,21 +166,29 @@ var checkedBox = $(this);
   }
   //update total cost
   $('.activities').append("<p id='p2'>Total Cost Will Be: $" + totalCost + "</p>");
-});
+  // for form Validation
+  if (totalCost === 0) { activitySelected = false;}
+  else if (totalCost > 0) {activitySelected=true;}
+  console.log(activitySelected);
+  });
 ///////////////////////////////////////////////////////////////////////////
 // Payment Fieldset Validator
 //////////////////////////////////////////////////////////////////////////
+// Set CVV max length
+$('#cvv').attr('maxlength', 3);
 // Hide everything by default initially
 $( "p:contains('PayPal')").hide();
 $( "p:contains('Bitcoin')").hide();
 $( "#credit-card").hide();
-$( "#payment").change(function() {
+
+$("#payment").change(function() {
   // if Credit Card selected
       if ($("#payment option:selected").text() == "Credit Card") {
         // hide Bitcoin and Paypal elements
           $( "#credit-card").show();
           $( "p:contains('PayPal')").hide();
           $( "p:contains('Bitcoin')").hide();
+          creditCardSelected = true;
           }
   // if PayPal selected
       else if ($("#payment option:selected").text() == "PayPal") {
@@ -186,6 +196,9 @@ $( "#payment").change(function() {
           $( "p:contains('PayPal')").show();
           $( "p:contains('Bitcoin')").hide();
           $( "#credit-card").hide();
+          paymentValid = true;
+          creditCardSelected = false;
+          return paymentValid;
           }
   // if bitcoin selected
       else if ($("#payment option:selected").text() == "Bitcoin") {
@@ -193,10 +206,87 @@ $( "#payment").change(function() {
           $( "p:contains('Bitcoin')").show();
           $( "p:contains('PayPal')").hide();
           $( "#credit-card").hide();
+          paymentValid = true;
+          creditCardSelected = false;
+          return paymentValid;
           }
       else {
+        // if nothing is selected change back to hide all
         $( "p:contains('PayPal')").hide();
         $( "p:contains('Bitcoin')").hide();
         $( "#credit-card").hide();
+        paymentValid = false;
+        creditCardSelected = false;
       }
 });
+//////////////////////////////////////////////////////////////////////
+// Form Validation Variables
+//////////////////////////////////////////////////////////////////////
+//Email Validation
+var emailValid = false;
+// Role/Job title initial state validation variable
+var tShirtSelected = false;
+// Payment initial state of form validation variable
+var activitySelected = false;
+// Payment initial state of form validation variable
+var ccNumValid = false;
+var zipValid = false;
+var cValidate = false;
+var paymentValid = false;
+var creditCardSelected = false;
+///////////////////////////////////////////////////////////////////////////
+// Form Validation
+//////////////////////////////////////////////////////////////////////////
+// Email regular expression taken from http://stackoverflow.com/questions/46155/validate-email-address-in-javascript
+var validateEmail = function(email) {
+    var RegEx = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+    return RegEx.test(email);
+};
+// On KeyUp, check if email is valid
+$("#mail").keyup(function() {
+  emailValid = validateEmail($(this).val());
+  return emailValid;
+});
+// Check if the number entered is actually a number
+var validateNumber = function(number) {
+    var REx = /^\d+$/;
+    return REx.test(number);
+
+
+};
+// on keyUp validate the numbers and whether the payment info overall is valid
+  $("#cc-num").keyup(function() {
+    ccNumValid = validateNumber($(this).val());
+    return ccNumValid;
+  });
+  $("#zip").keyup(function() {
+    zipValid = validateNumber($(this).val());
+    return zipValid;
+  });
+  $("#cvv").keyup(function() {
+    var cvvValid = validateNumber($(this).val());
+    var lengthValid = (String($(this).val()).length == 3);
+    cValidate = (cvvValid && lengthValid);
+    return cValidate;
+  });
+
+
+  $("button:submit").click(function() {
+    var noCCValid = (emailValid && activitySelected && paymentValid);
+    var CCValid = (emailValid && activitySelected && cValidate && zipValid && ccNumValid);
+    var isReady = (noCCValid || CCValid);
+    if (!isReady) {
+      event.preventDefault();
+    }
+    $(this).parent().find('#invalidEmail, #invalidAct, #invalidPay').remove();
+    if (!(emailValid)) {
+      $(this).parent().append("<p id='invalidEmail'> Email Invalid </p>");
+    }
+    if (!(activitySelected)) {
+      $(this).parent().append("<p id='invalidAct'> No Activity Selected </p>");
+    }
+    if (!(cValidate && zipValid && ccNumValid)|| !(paymentValid)) {
+      $(this).parent().append("<p id='invalidPay'> Incomplete/Invalid Payment Information </p>");
+    }
+
+    });
