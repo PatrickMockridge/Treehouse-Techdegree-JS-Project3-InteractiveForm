@@ -171,6 +171,23 @@ var checkedBox = $(this);
   else if (totalCost > 0) {activitySelected=true;}
   console.log(activitySelected);
   });
+//////////////////////////////////////////////////////////////////////
+// Form Validation Variables
+//////////////////////////////////////////////////////////////////////
+  //Email Validation
+  var emailValid = false;
+  // Role/Job title initial state validation variable
+  var tShirtSelected = false;
+  // Payment initial state of form validation variable
+  var activitySelected = false;
+  // Payment initial state of form validation variable
+  var ccNumValid = false;
+  var zipValid = false;
+  var cValidate = false;
+  //paymentValid basically means: have Bitcoin or PayPal been selected?
+  var paymentValid = false;
+  // if PayPal or Bitcoin haven't been selected, it's time to enter credit card info!
+  var creditCardSelected = !paymentValid;
 ///////////////////////////////////////////////////////////////////////////
 // Payment Fieldset Validator
 //////////////////////////////////////////////////////////////////////////
@@ -188,7 +205,8 @@ $("#payment").change(function() {
           $( "#credit-card").show();
           $( "p:contains('PayPal')").hide();
           $( "p:contains('Bitcoin')").hide();
-          creditCardSelected = true;
+          paymentValid = false;
+          return paymentValid;
           }
   // if PayPal selected
       else if ($("#payment option:selected").text() == "PayPal") {
@@ -197,7 +215,6 @@ $("#payment").change(function() {
           $( "p:contains('Bitcoin')").hide();
           $( "#credit-card").hide();
           paymentValid = true;
-          creditCardSelected = false;
           return paymentValid;
           }
   // if bitcoin selected
@@ -207,7 +224,6 @@ $("#payment").change(function() {
           $( "p:contains('PayPal')").hide();
           $( "#credit-card").hide();
           paymentValid = true;
-          creditCardSelected = false;
           return paymentValid;
           }
       else {
@@ -219,22 +235,7 @@ $("#payment").change(function() {
         creditCardSelected = false;
       }
 });
-//////////////////////////////////////////////////////////////////////
-// Form Validation Variables
-//////////////////////////////////////////////////////////////////////
-//Email Validation
-var emailValid = false;
-// Role/Job title initial state validation variable
-var tShirtSelected = false;
-// Payment initial state of form validation variable
-var activitySelected = false;
-// Payment initial state of form validation variable
-var ccNumValid = false;
-var zipValid = false;
-var cValidate = false;
-var paymentValid = false;
-var creditCardSelected = false;
-///////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////
 // Form Validation
 //////////////////////////////////////////////////////////////////////////
 // Email regular expression taken from http://stackoverflow.com/questions/46155/validate-email-address-in-javascript
@@ -251,7 +252,6 @@ $("#mail").keyup(function() {
 var validateNumber = function(number) {
     var REx = /^\d+$/;
     return REx.test(number);
-
 
 };
 // on keyUp validate the numbers and whether the payment info overall is valid
@@ -270,7 +270,6 @@ var validateNumber = function(number) {
     return cValidate;
   });
 
-
   $("button:submit").click(function() {
     var noCCValid = (emailValid && activitySelected && paymentValid);
     var CCValid = (emailValid && activitySelected && cValidate && zipValid && ccNumValid);
@@ -280,13 +279,13 @@ var validateNumber = function(number) {
     }
     $(this).parent().find('#invalidEmail, #invalidAct, #invalidPay').remove();
     if (!(emailValid)) {
-      $(this).parent().append("<p id='invalidEmail'> Email Invalid </p>");
+      $(this).parent().append("<p id='invalidEmail' style='color:red;'> Email Invalid </p>");
     }
     if (!(activitySelected)) {
-      $(this).parent().append("<p id='invalidAct'> No Activity Selected </p>");
+      $(this).parent().append("<p id='invalidAct' style='color:red;'> No Activity Selected </p>");
     }
-    if (!(cValidate && zipValid && ccNumValid)|| !(paymentValid)) {
-      $(this).parent().append("<p id='invalidPay'> Incomplete/Invalid Payment Information </p>");
+    if (!(cValidate && zipValid && ccNumValid) && !(paymentValid)) {
+      $(this).parent().append("<p id='invalidPay' style='color:red;'> Incomplete/Invalid Payment Information </p>");
     }
 
     });
