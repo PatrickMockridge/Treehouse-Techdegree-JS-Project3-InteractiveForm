@@ -1,5 +1,7 @@
 //use strict
 'use strict';
+//document ready
+$(document).ready(function() {
 //////////////////////////////////////////////////////////////////////
 // Construct the HTML in the Document
 //////////////////////////////////////////////////////////////////////
@@ -12,16 +14,13 @@ $('#fieldset-1').append("<input type='text' id='other-field' placeholder='Your T
 //hide text field initially
 $("#other-field").hide();
 //empty the color selector
-$('#color').empty();
+$('#color').html("<option value='none'>Please select a T-shirt Theme</option>");
 // Append total cost of everthing selected to the bottom of the activities fieldset
 // instantiate total cost variable
 var totalCost = 0;
 $('.activities').append("<p id='p2'> Total Cost Will Be: $" + totalCost + "</p>");
-// html finished loading, focus on first input field
-//focus on first field when document is ready document ready
-$(document).ready(function() {
+// html finished, focus on first input field
 $('#name').focus();
-});
 // when job role selector is changed,if it's changed to 'other', reveal the text field below
 $( "#title").change(function() {
   if ($("#title option:selected").text() == "Other") {
@@ -57,12 +56,12 @@ $( "#design").change(function() {
 //////////////////////////////////////////////////////////////////
 $(".activities > label").each (function() {
   // if the checkbox label relates to a morning activity
-  if ($(this).text().indexOf("9am-12pm") >= 0) {
+  if ($(this).text().indexOf("Tuesday 9am-12pm") >= 0) {
     // assign an appropriate variable
     $(this).children().attr("id", "morningBox");
   }
   // if the checkbox relates to an afternoon activity
-  else if ($(this).text().indexOf("1pm-4pm") >= 0) {
+  else if ($(this).text().indexOf("Tuesday 1pm-4pm") >= 0) {
     // assign an appropriate variable
       $(this).children().attr("id", "afternoonBox");
     }
@@ -174,6 +173,8 @@ var checkedBox = $(this);
 //////////////////////////////////////////////////////////////////////
 // Form Validation Variables
 //////////////////////////////////////////////////////////////////////
+  // Name Validation
+  var nameValid = false;
   //Email Validation
   var emailValid = false;
   // Role/Job title initial state validation variable
@@ -238,6 +239,11 @@ $("#payment").change(function() {
 //////////////////////////////////////////////////////////////////////////
 // Form Validation
 //////////////////////////////////////////////////////////////////////////
+$("#name").keyup(function() {
+  if ($("name").val() !== "") {
+    nameValid = true;
+    return nameValid;
+  }});
 // Email regular expression taken from http://stackoverflow.com/questions/46155/validate-email-address-in-javascript
 var validateEmail = function(email) {
     var RegEx = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
@@ -271,21 +277,27 @@ var validateNumber = function(number) {
   });
 
   $("button:submit").click(function() {
-    var noCCValid = (emailValid && activitySelected && paymentValid);
-    var CCValid = (emailValid && activitySelected && cValidate && zipValid && ccNumValid);
+    var noCCValid = (nameValid && emailValid && activitySelected && paymentValid);
+    var CCValid = (nameValid && emailValid && activitySelected && cValidate && zipValid && ccNumValid);
     var isReady = (noCCValid || CCValid);
     if (!isReady) {
       event.preventDefault();
     }
-    $(this).parent().find('#invalidEmail, #invalidAct, #invalidPay').remove();
+    $('label[for="name"]').css('color', '#184f68');
+    $('label[for="mail"]').css('color', '#184f68');
+    $('.activities > legend').css('color', '#184f68');
+    $('#fieldset-4 > legend').css('color', '#184f68');
+    if (!(nameValid)) {
+      $('label[for="name"]').css("color", "red");
+    }
     if (!(emailValid)) {
-      $(this).parent().append("<p id='invalidEmail' style='color:red;'> Email Invalid </p>");
+      $('label[for="mail"]').css("color", "red");
     }
     if (!(activitySelected)) {
-      $(this).parent().append("<p id='invalidAct' style='color:red;'> No Activity Selected </p>");
+      $(".activities > legend").css("color", "red");
     }
     if (!(cValidate && zipValid && ccNumValid) && !(paymentValid)) {
-      $(this).parent().append("<p id='invalidPay' style='color:red;'> Incomplete/Invalid Payment Information </p>");
+      $("#fieldset-4 > legend").css("color", "red");
     }
-
     });
+});
