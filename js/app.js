@@ -30,7 +30,7 @@ $( "#title").change(function() {
  else {
     $("#other-field").hide();
   }});
-// style the selector boxes 
+// style the selector boxes
 $('select').css({
     "-webkit-appearance": "button",
     "-moz-appearance" : "button",
@@ -57,27 +57,35 @@ $('select').css({
     "font-weight": "500",
     "color": "black"
 });
+$('select option:contains("Credit Card")').prop('selected',true);
 //////////////////////////////////////////////////////////////////
 // display correct color selectors based upon T-shirt design
 //////////////////////////////////////////////////////////////////
+var themeSelected = false;
 $( "#design").change(function() {
   // check if Theme - JS Puns has been selected
       if ($("#design option:selected").text() == "Theme - JS Puns") {
         //display appropriate colors
           $('#colors-js-puns').show();
           $("#color").html("<option value='cornflowerblue'>Cornflower Blue</option><option value='darkslategrey'>Dark Slate Grey</option><option value='gold'>Gold</option>");
+          themeSelected = true;
+          return themeSelected
           }
           // check if Theme - I ♥ JS has been selected
       else if ($("#design option:selected").text() == 'Theme - I ♥ JS') {
         // display appropriate colors again
               $('#colors-js-puns').show();
               $("#color").html("<option value='tomato'>Tomato</option><option value='steelblue'>Steel Blue</option><option value='dimgrey'>Dim Grey</option>");
+              themeSelected = true;
+              return themeSelected;
           }
           // if nothing has been selected
       else {
         //empty the colors selector of html
               $('#colors-js-puns').hide();
               $('#color').empty();
+              themeSelected = false;
+              return themeSelected;
       }
 });
 //////////////////////////////////////////////////////////////////
@@ -94,6 +102,10 @@ $(".activities > label").each (function() {
     // assign an appropriate variable
       $(this).children().attr("id", "afternoonBox");
     }
+  else if ($(this).text().indexOf("Wednesday") >= 0) {
+    // assign an appropriate variable
+      $(this).children().attr("id", "Wednesday");
+  }
 else {
       // assign an appropriate variable
       $(this).children().attr("id", "wholeDayBox");
@@ -149,6 +161,10 @@ var checkedBox = $(this);
      // remaining box is for the conference
      totalCost += 200;
    }
+   else if ($(this).attr("id") == "Wednesday") {
+     // remaining box is for the conference
+     totalCost += 100;
+   }
  }
     ///////////////////////////////////////////////////////////////////////////
     // When Check Box is Unchecked
@@ -190,6 +206,10 @@ var checkedBox = $(this);
            // remaining box is for the conference
            totalCost -= 200;
          }
+         else if ($(this).attr("id") == "Wednesday") {
+           // remaining box is for the conference
+           totalCost -= 100;
+         }
 
   }
   //update total cost
@@ -223,10 +243,9 @@ var checkedBox = $(this);
 //////////////////////////////////////////////////////////////////////////
 // Set CVV max length
 $('#cvv').attr('maxlength', 3);
-// Hide everything by default initially
+// Hide everything but credit card by default initially
 $( "p:contains('PayPal')").hide();
 $( "p:contains('Bitcoin')").hide();
-$( "#credit-card").hide();
 
 $("#payment").change(function() {
   // if Credit Card selected
@@ -286,6 +305,11 @@ $("#mail").keyup(function() {
 // use Credit Card Validation JQuery Plugin Function
   ccNumValid = $("#cc-num").validateCreditCard().valid;
 
+  var validateNumber = function(number) {
+    var REx = /^\d+$/;
+    return REx.test(number);
+  };
+
   $("#zip").keyup(function() {
     zipValid = validateNumber($(this).val());
     return zipValid;
@@ -300,7 +324,7 @@ $("#mail").keyup(function() {
   $("button:submit").click(function() {
     var noCCValid = (nameValid && emailValid && activitySelected && paymentValid);
     var CCValid = (nameValid && emailValid && activitySelected && cValidate && zipValid && ccNumValid);
-    var isReady = (noCCValid || CCValid);
+    var isReady = ((noCCValid || CCValid) && themeSelected);
     if (!isReady) {
       event.preventDefault();
     }
@@ -319,6 +343,9 @@ $("#mail").keyup(function() {
     }
     if (!(cValidate && zipValid && ccNumValid) && !(paymentValid)) {
       $("#fieldset-4 > legend").css("color", "red");
+    }
+    if (!themeSelected) {
+      $('.shirt > legend').css("color", "red");
     }
     });
 });
