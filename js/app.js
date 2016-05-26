@@ -13,8 +13,9 @@ $(this).attr("id", "fieldset-" + (index+1));
 $('#fieldset-1').append("<input type='text' id='other-field' placeholder='Your Title...' name='otherJob'>");
 //hide text field initially
 $("#other-field").hide();
-//empty the color selector
+//empty the color selector and hide it
 $('#color').html("<option value='none'>Please select a T-shirt Theme</option>");
+$('#colors-js-puns').hide();
 // Append total cost of everthing selected to the bottom of the activities fieldset
 // instantiate total cost variable
 var totalCost = 0;
@@ -29,8 +30,33 @@ $( "#title").change(function() {
  else {
     $("#other-field").hide();
   }});
-
-
+// style the selector boxes 
+$('select').css({
+    "-webkit-appearance": "button",
+    "-moz-appearance" : "button",
+    "-webkit-user-select": "none",
+    "-moz-user-select": "none",
+    "-webkit-padding-end": "20px",
+    "-moz-padding-end": "20px",
+    "-webkit-padding-start": "2px",
+    "-moz-padding-start": "2px",
+    "background-color": "#c1deeb",
+    "background-position": "center right",
+    "background-repeat": "no-repeat",
+    "border": "1px solid #AAA",
+    "border-radius": "2px",
+    "box-shadow": "0px 1px 3px rgba(0, 0, 0, 0.1)",
+    "color": "#555",
+    "font-size": "inherit",
+    "margin": "0",
+    "overflow": "hidden",
+    "padding-top": "2px",
+    "padding-bottom": "2px",
+    "text-overflow": "ellipsis",
+    "white-space": "nowrap",
+    "font-weight": "500",
+    "color": "black"
+});
 //////////////////////////////////////////////////////////////////
 // display correct color selectors based upon T-shirt design
 //////////////////////////////////////////////////////////////////
@@ -38,16 +64,19 @@ $( "#design").change(function() {
   // check if Theme - JS Puns has been selected
       if ($("#design option:selected").text() == "Theme - JS Puns") {
         //display appropriate colors
+          $('#colors-js-puns').show();
           $("#color").html("<option value='cornflowerblue'>Cornflower Blue</option><option value='darkslategrey'>Dark Slate Grey</option><option value='gold'>Gold</option>");
           }
           // check if Theme - I ♥ JS has been selected
       else if ($("#design option:selected").text() == 'Theme - I ♥ JS') {
         // display appropriate colors again
+              $('#colors-js-puns').show();
               $("#color").html("<option value='tomato'>Tomato</option><option value='steelblue'>Steel Blue</option><option value='dimgrey'>Dim Grey</option>");
           }
           // if nothing has been selected
       else {
         //empty the colors selector of html
+              $('#colors-js-puns').hide();
               $('#color').empty();
       }
 });
@@ -254,17 +283,9 @@ $("#mail").keyup(function() {
   emailValid = validateEmail($(this).val());
   return emailValid;
 });
-// Check if the number entered is actually a number
-var validateNumber = function(number) {
-    var REx = /^\d+$/;
-    return REx.test(number);
+// use Credit Card Validation JQuery Plugin Function
+  ccNumValid = $("#cc-num").validateCreditCard().valid;
 
-};
-// on keyUp validate the numbers and whether the payment info overall is valid
-  $("#cc-num").keyup(function() {
-    ccNumValid = validateNumber($(this).val());
-    return ccNumValid;
-  });
   $("#zip").keyup(function() {
     zipValid = validateNumber($(this).val());
     return zipValid;
